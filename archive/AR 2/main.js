@@ -27,7 +27,7 @@ arButton.style.color = 'red';
 const loader = new GLTFLoader();
 let model;
 
-loader.load('./3d/TP.glb', (gltf) => {
+loader.load('/3d/TP.glb', (gltf) => {
     model = gltf.scene;
     model.scale.set(0.1, 0.1, 0.1);
     scene.add(model);
