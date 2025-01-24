@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { ARButton } from 'three/examples/jsm/webxr/ARButton.js';
 
 const scene = new THREE.Scene();
@@ -13,17 +12,8 @@ document.body.appendChild(ARButton.createButton(renderer));
 const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
 const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 const cube = new THREE.Mesh(geometry, material);
+cube.visible = false;
 scene.add(cube);
-
-const reticle = new THREE.Mesh(
-    new THREE.RingGeometry(0.15, 0.2, 32).rotateX(-Math.PI / 2),
-    new THREE.MeshBasicMaterial({ color: 0xffffff })
-);
-reticle.visible = false;
-scene.add(reticle);
-
-camera.position.set(0, 1.5, 2);
-const controls = new OrbitControls(camera, renderer.domElement);
 
 let isAnimating = false;
 function animate() {
@@ -36,6 +26,14 @@ function animate() {
     });
 }
 animate();
+
+// Додавання об'єкта за натисканням
+const controller = renderer.xr.getController(0);
+controller.addEventListener('select', (event) => {
+    cube.position.set(0, 0, -0.5).applyMatrix4(controller.matrixWorld);
+    cube.visible = true;
+});
+scene.add(controller);
 
 // Створення кнопок
 const controlsDiv = document.createElement('div');
