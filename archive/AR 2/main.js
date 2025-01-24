@@ -28,7 +28,7 @@ const loader = new GLTFLoader();
 let model;
 
 // loader.load('/3d/TP.glb', (gltf) => {
-  loader.load('./TP.glb', (gltf) => {
+  loader.load('https://github.com/mykola-telychko/threejs-examples/blob/main/archive/AR%202/TP.glb', (gltf) => {
 
     model = gltf.scene;
     model.scale.set(0.1, 0.1, 0.1);
