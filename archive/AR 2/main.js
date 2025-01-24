@@ -6,14 +6,13 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 // create scene
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 1;
+camera.position.set(0, 1.5, 3);
 
 // Добавляем освещение
-const ambientLight = new THREE.AmbientLight(0xffcc99, 0.5); // Мягкий свет для всей сцены
+const ambientLight = new THREE.AmbientLight(0xffcc99, 0.5);
 scene.add(ambientLight);
-
 const directionalLight = new THREE.DirectionalLight(0xffaa66, 0.7);
-directionalLight.position.set(5, 5, 5).normalize(); // Направленный свет сверху
+directionalLight.position.set(5, 5, 5).normalize();
 scene.add(directionalLight);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -21,24 +20,21 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.xr.enabled = true;
 document.body.appendChild(renderer.domElement);
 
+// Enable AR
+document.body.appendChild(ARButton.createButton(renderer));
+const arSession = renderer.xr.getSession;
+
 // OrbitControls
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.25;
 controls.rotateSpeed = 0.5;
 
-// button AR
-document.body.appendChild(ARButton.createButton(renderer));
-const arButton = document.getElementById('ARButton');
-arButton.style.color = 'red';
-
 // Load GLB model
 const loader = new GLTFLoader();
 let model;
 
-// loader.load('/3d/TP.glb', (gltf) => {
-  loader.load('/TP.glb', (gltf) => {
-
+loader.load('/TP.glb', (gltf) => {
     model = gltf.scene;
     model.scale.set(0.1, 0.1, 0.1);
     scene.add(model);
@@ -47,7 +43,6 @@ let model;
 });
 
 let isAnimating = true;
-
 function animate() {
     if (isAnimating && model) {
         model.rotation.y += 0.01;
@@ -55,6 +50,10 @@ function animate() {
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
 }
+
+renderer.setAnimationLoop(() => {
+    renderer.render(scene, camera);
+});
 
 animate();
 
@@ -87,4 +86,3 @@ createButton('Rotate', () => { if (model) model.rotation.y += Math.PI / 4; });
 createButton('Scale Up', () => { if (model) model.scale.multiplyScalar(1.2); });
 createButton('Scale Down', () => { if (model) model.scale.multiplyScalar(0.8); });
 createButton('Toggle Animation', () => { isAnimating = !isAnimating; });
-
