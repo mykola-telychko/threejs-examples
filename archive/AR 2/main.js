@@ -36,15 +36,21 @@ let model;
 
 loader.load('/TP.glb', (gltf) => {
     model = gltf.scene;
-    model.scale.set(0.1, 0.1, 0.1);
+    model.scale.set(0.3, 0.3, 0.3); 
+    model.visible = false; // ???
     scene.add(model);
+
+    // Показуємо модель лише після завершення завантаження
+    setTimeout(() => {
+        model.visible = true;
+    }, 500);
 }, undefined, (error) => {
     console.error('Error loading model:', error);
 });
 
 let isAnimating = true;
 function animate() {
-    if (isAnimating && model) {
+    if (isAnimating && model && model.visible) {
         model.rotation.y += 0.01;
     }
     renderer.render(scene, camera);
