@@ -34,7 +34,39 @@ rotateButton.position.set(0.2, 0.2, -0.5);
 rotateButton.visible = false;
 scene.add(rotateButton);
 
+// Створення екранних кнопок
+const controlsDiv = document.createElement('div');
+controlsDiv.style.position = 'absolute';
+controlsDiv.style.top = '10px';
+controlsDiv.style.left = '10px';
+controlsDiv.style.zIndex = '100';
+document.body.appendChild(controlsDiv);
+
+function createButton(text, onClick) {
+    const button = document.createElement('button');
+    button.innerText = text;
+    button.style.margin = '5px';
+    button.addEventListener('click', onClick);
+    controlsDiv.appendChild(button);
+}
+
+createButton('Rotate', () => {
+    cube.rotation.y += Math.PI / 4;
+});
+
+createButton('Scale Up', () => {
+    cube.scale.multiplyScalar(1.2);
+});
+
+createButton('Scale Down', () => {
+    cube.scale.multiplyScalar(0.8);
+});
+
 let isAnimating = false;
+createButton('Start Animation', () => {
+    isAnimating = !isAnimating;
+});
+
 function animate() {
     if (isAnimating) {
         cube.rotation.y += 0.01;
@@ -54,6 +86,7 @@ controller.addEventListener('select', () => {
     scaleUpButton.visible = true;
     scaleDownButton.visible = true;
     rotateButton.visible = true;
+    controlsDiv.style.display = 'none'; // Приховуємо екранні кнопки у AR
 });
 scene.add(controller);
 
