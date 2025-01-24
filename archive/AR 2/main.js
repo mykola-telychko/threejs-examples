@@ -40,12 +40,16 @@ controlsDiv.style.position = 'absolute';
 controlsDiv.style.top = '10px';
 controlsDiv.style.left = '10px';
 controlsDiv.style.zIndex = '100';
+controlsDiv.style.display = 'block'; // Показує кнопки на початку
+controlsDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+controlsDiv.style.padding = '10px';
 document.body.appendChild(controlsDiv);
 
 function createButton(text, onClick) {
     const button = document.createElement('button');
     button.innerText = text;
     button.style.margin = '5px';
+    button.style.padding = '10px';
     button.addEventListener('click', onClick);
     controlsDiv.appendChild(button);
 }
