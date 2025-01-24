@@ -1,75 +1,55 @@
 import * as THREE from 'three';
 import { ARButton } from 'three/examples/jsm/webxr/ARButton.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 // create scene
 const scene = new THREE.Scene();
-
-// camera settings
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.z = 1;  // Переміщаємо камеру так, щоб куб був видимий
-
-// Створення рендерера
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.xr.enabled = true; // 
 document.body.appendChild(renderer.domElement);
+
+// OrbitControls - start
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; // Додаємо демпфірування для плавного руху
+controls.dampingFactor = 0.25;
+controls.rotateSpeed = 0.5;
+// OrbitControls - end
 
 // button AR
 document.body.appendChild(ARButton.createButton(renderer));
 const arButton = document.getElementById( 'ARButton' );
 arButton.style.color = 'red';
 
-// Створення геометрії для куба
+// cube size
 const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
 const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 const cube = new THREE.Mesh(geometry, material);
-cube.visible = true; // Зробити куб видимим
+cube.visible = true; 
 scene.add(cube);
 
-// Додавання куба в сцену
-// scene.add(cube); // ???
+let isAnimating = true; // Flag to control animation state
 
+function animate() {
+  if (isAnimating) { // Check if animation should run
+    cube.rotation.x += 0.01;
+    cube.rotation.y += 0.01;
+  }
+  renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+}
 
-// +++++++++++++++++++++++
-// start animation
-// function animate() {
-//     cube.rotation.x += 0.01;
-//     cube.rotation.y += 0.01;
+animate();
 
-//     renderer.render(scene, camera);
-//     requestAnimationFrame(animate); 
-// }
-// animate(); 
-// // Обробка подій зміни розміру вікна
-// window.addEventListener('resize', () => {
-//     renderer.setSize(window.innerWidth, window.innerHeight);
-//     camera.aspect = window.innerWidth / window.innerHeight;
-//     camera.updateProjectionMatrix();
-// });
-// +++++++++++++++++++++++
+// handle reseize
+window.addEventListener('resize', () => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+});
 
-
-
-// Віртуальні кнопки в сцені
-const buttonGeometry = new THREE.BoxGeometry(0.1, 0.05, 0.01);
-const buttonMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-
-const scaleUpButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
-scaleUpButton.position.set(-0.2, 0.2, -0.5);
-scaleUpButton.visible = false;
-scene.add(scaleUpButton);
-
-const scaleDownButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
-scaleDownButton.position.set(0, 0.2, -0.5);
-scaleDownButton.visible = false;
-scene.add(scaleDownButton);
-
-const rotateButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
-rotateButton.position.set(0.2, 0.2, -0.5);
-rotateButton.visible = false;
-scene.add(rotateButton);
-
-// Створення екранних кнопок
 const controlsDiv = document.createElement('div');
 controlsDiv.style.position = 'absolute';
 controlsDiv.style.top = '10px';
@@ -81,83 +61,19 @@ controlsDiv.style.padding = '10px';
 document.body.appendChild(controlsDiv);
 
 function createButton(text, onClick) {
-    const button = document.createElement('button');
-    button.innerText = text;
-    button.style.margin = '5px';
-    button.style.padding = '10px';
-    button.addEventListener('click', onClick);
-    controlsDiv.appendChild(button);
+  const button = document.createElement('button');
+  button.innerText = text;
+  button.style.margin = '5px';
+  button.style.padding = '10px';
+  button.addEventListener('click', onClick);
+  controlsDiv.appendChild(button);
 }
 
-createButton('Rotate', () => {
-    cube.rotation.y += Math.PI / 4;
-});
+createButton('Rotate', () => { cube.rotation.y += Math.PI / 4;});
+createButton('Scale Up', () => { cube.scale.multiplyScalar(1.2);});
+createButton('Scale Down', () => { cube.scale.multiplyScalar(0.8);});
 
-createButton('Scale Up', () => {
-    cube.scale.multiplyScalar(1.2);
-});
-
-createButton('Scale Down', () => {
-    cube.scale.multiplyScalar(0.8);
-});
-
-let isAnimating = true;
 createButton('Start Animation', () => {
-    console.log('isAnimating_1', isAnimating);
-    isAnimating = !isAnimating;
-    // animate();
+  isAnimating = !isAnimating; // Toggle animation state
+  console.log('isAnimating:', isAnimating);
 });
-
-function animate() {
-    isAnimating = !isAnimating;
-
-    console.log('isAnimating__', isAnimating);
-
-    if (isAnimating) {
-        cube.rotation.y += 0.01;
-        cube.rotation.x += 0.01;
-    }
-    renderer.setAnimationLoop(() => {
-        renderer.render(scene, camera);
-    });
-}
-animate();
-
-
-// Додавання об'єкта за натисканням
-const controller = renderer.xr.getController(0);
-controller.addEventListener('select', () => {
-    cube.position.set(0, 0, -0.5).applyMatrix4(controller.matrixWorld);
-    cube.visible = true;
-    scaleUpButton.visible = true;
-    scaleDownButton.visible = true;
-    rotateButton.visible = true;
-    controlsDiv.style.display = 'none'; // Приховуємо екранні кнопки у AR
-});
-scene.add(controller);
-
-// Взаємодія з об'єктами в AR
-const raycaster = new THREE.Raycaster();
-const tempMatrix = new THREE.Matrix4();
-
-controller.addEventListener('selectstart', () => {
-    tempMatrix.identity().extractRotation(controller.matrixWorld);
-    raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
-    raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
-
-    const intersects = raycaster.intersectObjects([cube, scaleUpButton, scaleDownButton, rotateButton]);
-
-    if (intersects.length > 0) {
-        const selectedObject = intersects[0].object;
-        if (selectedObject === cube) {
-            cube.rotation.y += Math.PI / 4;
-        } else if (selectedObject === scaleUpButton) {
-            cube.scale.multiplyScalar(1.2);
-        } else if (selectedObject === scaleDownButton) {
-            cube.scale.multiplyScalar(0.8);
-        } else if (selectedObject === rotateButton) {
-            cube.rotation.y += Math.PI / 4;
-        }
-    }
-});
-scene.add(controller);
