@@ -21,8 +21,12 @@ renderer.xr.enabled = true;
 document.body.appendChild(renderer.domElement);
 
 // Enable AR
-document.body.appendChild(ARButton.createButton(renderer));
-const arSession = renderer.xr.getSession;
+const arButton = ARButton.createButton(renderer);
+arButton.style.position = 'absolute';
+arButton.style.bottom = '20px';
+arButton.style.left = '50%';
+arButton.style.transform = 'translateX(-50%)';
+document.body.appendChild(arButton);
 
 // OrbitControls
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -36,11 +40,11 @@ let model;
 
 loader.load('/TP.glb', (gltf) => {
     model = gltf.scene;
-    model.scale.set(0.3, 0.3, 0.3); 
-    model.visible = false; // ???
+    model.scale.set(0.1, 0.1, 0.1); // Зменшено масштаб моделі для AR
+    model.visible = false;
     scene.add(model);
 
-    // Показуємо модель лише після завершення завантаження
+    // Показуємо модель після завершення завантаження
     setTimeout(() => {
         model.visible = true;
     }, 500);
