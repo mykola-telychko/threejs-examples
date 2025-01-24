@@ -1,19 +1,54 @@
 import * as THREE from 'three';
 import { ARButton } from 'three/examples/jsm/webxr/ARButton.js';
 
+// create scene
 const scene = new THREE.Scene();
+
+// camera settings
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 1;  // Переміщаємо камеру так, щоб куб був видимий
+
+// Створення рендерера
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.xr.enabled = true;
+renderer.xr.enabled = true; // 
 document.body.appendChild(renderer.domElement);
-document.body.appendChild(ARButton.createButton(renderer));
 
+// button AR
+document.body.appendChild(ARButton.createButton(renderer));
+const arButton = document.getElementById( 'ARButton' );
+arButton.style.color = 'red';
+
+// Створення геометрії для куба
 const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
 const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 const cube = new THREE.Mesh(geometry, material);
-cube.visible = true;  // Зробити куб видимим на початковій сторінці
+cube.visible = true; // Зробити куб видимим
 scene.add(cube);
+
+// Додавання куба в сцену
+// scene.add(cube); // ???
+
+
+// +++++++++++++++++++++++
+// start animation
+// function animate() {
+//     cube.rotation.x += 0.01;
+//     cube.rotation.y += 0.01;
+
+//     renderer.render(scene, camera);
+//     requestAnimationFrame(animate); 
+// }
+// animate(); 
+// // Обробка подій зміни розміру вікна
+// window.addEventListener('resize', () => {
+//     renderer.setSize(window.innerWidth, window.innerHeight);
+//     camera.aspect = window.innerWidth / window.innerHeight;
+//     camera.updateProjectionMatrix();
+// });
+// +++++++++++++++++++++++
+
+
 
 // Віртуальні кнопки в сцені
 const buttonGeometry = new THREE.BoxGeometry(0.1, 0.05, 0.01);
@@ -66,12 +101,18 @@ createButton('Scale Down', () => {
     cube.scale.multiplyScalar(0.8);
 });
 
-let isAnimating = false;
+let isAnimating = true;
 createButton('Start Animation', () => {
+    console.log('isAnimating_1', isAnimating);
     isAnimating = !isAnimating;
+    // animate();
 });
 
 function animate() {
+    isAnimating = !isAnimating;
+
+    console.log('isAnimating__', isAnimating);
+
     if (isAnimating) {
         cube.rotation.y += 0.01;
         cube.rotation.x += 0.01;
@@ -81,6 +122,7 @@ function animate() {
     });
 }
 animate();
+
 
 // Додавання об'єкта за натисканням
 const controller = renderer.xr.getController(0);
