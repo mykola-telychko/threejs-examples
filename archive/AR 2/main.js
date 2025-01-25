@@ -7,6 +7,15 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.z = 1;
+
+// Добавляем освещение
+const ambientLight = new THREE.AmbientLight(0xffcc99, 0.5); // Мягкий свет для всей сцены
+scene.add(ambientLight);
+
+const directionalLight = new THREE.DirectionalLight(0xffaa66, 0.7);
+directionalLight.position.set(5, 5, 5).normalize(); // Направленный свет сверху
+scene.add(directionalLight);
+
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.xr.enabled = true;
@@ -78,3 +87,4 @@ createButton('Rotate', () => { if (model) model.rotation.y += Math.PI / 4; });
 createButton('Scale Up', () => { if (model) model.scale.multiplyScalar(1.2); });
 createButton('Scale Down', () => { if (model) model.scale.multiplyScalar(0.8); });
 createButton('Toggle Animation', () => { isAnimating = !isAnimating; });
+
