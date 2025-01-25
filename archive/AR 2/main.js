@@ -41,7 +41,7 @@ let model;
 loader.load('/TP.glb', (gltf) => {
     model = gltf.scene;
     model.scale.set(0.1, 0.1, 0.1);
-    model.position.set(0, 0, -0.5); // Центруємо модель перед камерою
+    model.position.set(0, 0, -0.5);
     model.visible = false;
     scene.add(model);
 
@@ -50,6 +50,20 @@ loader.load('/TP.glb', (gltf) => {
     }, 500);
 }, undefined, (error) => {
     console.error('Error loading model:', error);
+});
+
+// AR hit test for placing the model on a surface
+const controller = renderer.xr.getController(0);
+scene.add(controller);
+
+controller.addEventListener('select', (event) => {
+    const hitTestSource = event.target.xrHitTestSource;
+    if (hitTestSource && model) {
+        const hit = hitTestSource.getHit(0);
+        if (hit) {
+            model.position.set(hit.transform.position.x, hit.transform.position.y, hit.transform.position.z);
+        }
+    }
 });
 
 let isAnimating = true;
