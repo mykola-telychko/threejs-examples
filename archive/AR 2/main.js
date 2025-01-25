@@ -26,7 +26,6 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.25;
 controls.rotateSpeed = 0.5;
-
 // button AR
 document.body.appendChild(ARButton.createButton(renderer));
 const arButton = document.getElementById('ARButton');
@@ -36,8 +35,7 @@ arButton.style.color = 'red';
 const loader = new GLTFLoader();
 let model;
 
-// loader.load('/3d/TP.glb', (gltf) => {
-  loader.load('/TP.glb', (gltf) => {
+loader.load('/TP.glb', (gltf) => {
 
     model = gltf.scene;
     model.scale.set(0.1, 0.1, 0.1);
@@ -45,7 +43,6 @@ let model;
 }, undefined, (error) => {
     console.error('Error loading model:', error);
 });
-
 let isAnimating = true;
 
 function animate() {
@@ -55,7 +52,6 @@ function animate() {
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
 }
-
 animate();
 
 // handle resize
@@ -82,7 +78,6 @@ function createButton(text, onClick) {
     button.addEventListener('click', onClick);
     controlsDiv.appendChild(button);
 }
-
 createButton('Rotate', () => { if (model) model.rotation.y += Math.PI / 4; });
 createButton('Scale Up', () => { if (model) model.scale.multiplyScalar(1.2); });
 createButton('Scale Down', () => { if (model) model.scale.multiplyScalar(0.8); });
