@@ -40,11 +40,11 @@ let model;
 
 loader.load('/TP.glb', (gltf) => {
     model = gltf.scene;
-    model.scale.set(0.1, 0.1, 0.1); // Зменшено масштаб моделі для AR
+    model.scale.set(0.1, 0.1, 0.1);
+    model.position.set(0, 0, -0.5); // Центруємо модель перед камерою
     model.visible = false;
     scene.add(model);
 
-    // Показуємо модель після завершення завантаження
     setTimeout(() => {
         model.visible = true;
     }, 500);
