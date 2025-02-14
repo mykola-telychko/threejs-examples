@@ -51,10 +51,36 @@ if (isIOS) {
             const box = new THREE.Box3().setFromObject(model);
             const size = new THREE.Vector3();
             box.getSize(size);
-            const scaleFactor = 400 / Math.max(size.x, size.y, size.z);
+
+            // Scale the model to 8 times its original size
+            const scaleFactor = (8 * 1) / Math.max(size.x, size.y, size.z); // 8 times larger
             model.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
+            // Center the model
+            const center = new THREE.Vector3();
+            box.getCenter(center);
+            model.position.sub(center);
+
             scene.add(model);
-        }
+
+            if (gltf.animations.length) {
+                mixer = new THREE.AnimationMixer(model);
+                gltf.animations.forEach((clip) => {
+                    mixer.clipAction(clip).play();
+                });
+            }
+        },
+        (xhr) => console.log(`Loading: ${(xhr.loaded / xhr.total) * 100}% complete`),
+        (error) => console.error('Error loading model:', error)
     );
+
+    // Animation
+    const clock = new THREE.Clock();
+    function animate() {
+        renderer.setAnimationLoop(() => {
+            if (mixer) mixer.update(clock.getDelta());
+            renderer.render(scene, camera);
+        });
+    }
+    animate();
 }
